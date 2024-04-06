@@ -1,0 +1,38 @@
+GET http://localhost:3333/check
+
+
+###
+
+POST http://localhost:3333/events
+Content-Type: application/json
+
+{
+  "title":"NLW unite v1",
+  "details":"Um evento para quem é apaixonado por programação",
+  "maximumAttendees": 100
+}
+
+###
+POST http://localhost:3333/events/5c97bc01-edaf-445b-8a5d-09c2e5ca730e/attendees
+Content-Type: application/json
+
+{
+  "name":"whyyGoone",
+  "email":"whyyGoonee@whyyGone.com"
+}
+
+
+### 
+GET http://localhost:3333/events/5c97bc01-edaf-445b-8a5d-09c2e5ca730e
+
+
+### 
+GET http://localhost:3333/attendees/1/badge
+
+
+###
+GET http://localhost:3333/attendees/1/check-in
+
+
+### 
+GET http://localhost:3333/events/5c97bc01-edaf-445b-8a5d-09c2e5ca730e/attendees
