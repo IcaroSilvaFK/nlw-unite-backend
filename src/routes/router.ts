@@ -3,8 +3,8 @@ import { z } from 'zod'
 import { generateSlug } from 'utils/generateSlug'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
-import { NotFoundError } from 'errors/NotFoundError'
-import { BadRequestException } from 'errors/BadRequestException'
+import { NotFoundError } from 'errors/notFoundError'
+import { BadRequestException } from 'errors/badRequestException'
 
 export async function router(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post("/events", {
@@ -297,7 +297,10 @@ export async function router(app: FastifyInstance) {
               createdAt: z.date(),
               checkInAt: z.date().nullable()
             })
-          )
+          ),
+          quantityPages: z.number(),
+          count: z.number(),
+          showing: z.number()
         })
       }
     }
@@ -306,35 +309,48 @@ export async function router(app: FastifyInstance) {
     const { eventId } = req.params
     const { pageIndex, query } = req.query
 
-    const attendees = await req.db.attendee.findMany({
-      where: {
-        eventId,
-        ...(query && {
-          name: {
-            contains: query,
-
+    const [count, attendees] = await req.db.$transaction(
+      [
+        req.db.attendee.count({
+          where: {
+            eventId,
+            ...(query && {
+              name: {
+                contains: query,
+              },
+            })
           }
-        })
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        createdAt: true,
-        checkIn: {
+        }),
+        req.db.attendee.findMany({
+          where: {
+            eventId,
+            ...(query && {
+              name: {
+                contains: query,
+              },
+            })
+          },
           select: {
-            createdAt: true
-          }
-        },
-      },
-      take: 10,
-      skip: pageIndex * 10,
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
+            id: true,
+            name: true,
+            email: true,
+            createdAt: true,
+            checkIn: {
+              select: {
+                createdAt: true
+              },
+            },
 
-    // const response = attendees.map()
+          },
+          take: 10,
+          skip: pageIndex * 10,
+          orderBy: {
+            createdAt: 'desc'
+          },
+        })])
+
+    const quantityPages = Math.ceil(count / 10)
+    const showing = (pageIndex + 1) * 10
 
     return reply.send({
       attendees: attendees.map((item) => ({
@@ -343,7 +359,10 @@ export async function router(app: FastifyInstance) {
         name: item.name,
         createdAt: item.createdAt,
         checkInAt: item.checkIn?.createdAt ?? null
-      }))
+      })),
+      quantityPages,
+      count,
+      showing
     })
   })
 

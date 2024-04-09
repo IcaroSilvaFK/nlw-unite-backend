@@ -35,4 +35,4 @@ GET http://localhost:3333/attendees/1/check-in
 
 
 ### 
-GET http://localhost:3333/events/5c97bc01-edaf-445b-8a5d-09c2e5ca730e/attendees
+GET http://localhost:3333/events/9e0e17e6-8b6e-4846-a71d-eabc09a38c2e/attendees

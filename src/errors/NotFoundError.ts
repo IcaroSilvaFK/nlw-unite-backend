@@ -1,4 +1,4 @@
-import { BaseAppError } from "./base/BaseAppError"
+import { BaseAppError } from "./base/baseAppError"
 
 export class NotFoundError extends BaseAppError {
   constructor(message: string, cause?: unknown) {

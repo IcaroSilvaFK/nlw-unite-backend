@@ -11,9 +11,8 @@ async function prismaPlugin(fastify: FastifyInstance, options: FastifyPluginOpti
   fastify.decorate("db", prisma)
 
 
-  fastify.addHook("onRequest", (req, reply, done) => {
+  fastify.addHook("onRequest", (req, _, done) => {
     req.db = prisma
-
     done()
   })
 
